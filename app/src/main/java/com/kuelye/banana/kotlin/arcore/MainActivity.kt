@@ -1,21 +1,16 @@
 package com.kuelye.banana.kotlin.arcore
 
-import android.animation.Animator
 import android.animation.ValueAnimator
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.animation.addListener
 import com.google.ar.core.HitResult
 import com.google.ar.sceneform.AnchorNode
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Vector3
-import com.google.ar.sceneform.rendering.Color
-import com.google.ar.sceneform.rendering.MaterialFactory
-import com.google.ar.sceneform.rendering.Renderable
-import com.google.ar.sceneform.rendering.ShapeFactory
+import com.google.ar.sceneform.rendering.*
 import com.google.ar.sceneform.ux.ArFragment
-import java.util.*
+import com.kuelye.banana.kotlin.arcore.model.Ratings
+import com.kuelye.banana.kotlin.arcore.model.RatingsView
 
 class MainActivity : AppCompatActivity() {
 
@@ -29,7 +24,7 @@ class MainActivity : AppCompatActivity() {
         initialize()
         arFragment = supportFragmentManager.findFragmentById(R.id.ar_fragment) as ArFragment;
         arFragment?.setOnTapArPlaneListener { hitResult, _, _ ->
-            addSphere(hitResult)
+            addRatings(hitResult)
         }
     }
 
@@ -63,5 +58,23 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun addRatings(hitResult: HitResult?) {
+        val containerNode = AnchorNode(hitResult!!.createAnchor())
+        containerNode.setParent(arFragment!!.arSceneView.scene)
+
+        val ratingsView = RatingsView(this)
+        ratingsView.ratings = Ratings.createTestRatings();
+        ViewRenderable.builder()
+            .setView(this, ratingsView)
+            .build()
+            .thenAccept {
+                val node = Node()
+                node.setParent(containerNode)
+                node.renderable = it
+            }
+    }
+
+
 
 }
